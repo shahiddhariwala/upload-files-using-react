@@ -1,24 +1,24 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
 import './App.css';
 
 function App() {
+
+  const [file, setFile] = useState("");
+  const inputFileHandler = (e) => {
+    try {
+      setFile(e.target.files[0]);
+    }
+    catch (e) {
+      console.error("Something Went Wrong !!", e);
+    }
+    console.log("Files", e.target.files);
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <input type="file" onChange={(e) => inputFileHandler(e)} />
+      <button>
+        Upload
+      </button>
     </div>
   );
 }
