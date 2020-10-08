@@ -4,12 +4,13 @@ import axios from "axios";
 
 function App() {
 
-  const [file, setFile] = useState("");
+  const [files, setFile] = useState([]);
   const inputRef = useRef();
 
   const inputFileHandler = (e) => {
+    console.log(e.target.files);
     try {
-      setFile(e.target.files[0]);
+      setFile(e.target.files);
     }
     catch (e) {
       console.error("Something Went Wrong , while selecting the file!!", e);
@@ -18,9 +19,9 @@ function App() {
 
   const fileUploadHandler = () => {
     const fd = new FormData();
-    if (file) {
-      fd.append('image', file, file.name);
-
+    if (files) {
+      files.values().forEach(file => fd.append('image', file, file.name))
+      console.log("form Data", fd);
       axios.post(`http://yourApi/uploadFile`, fd, {
         onUploadProgress: progressEvent => {
           console.log("Upload Progress: " + Math.round(progressEvent.loaded / progressEvent.total * 100) + " %");
@@ -35,17 +36,25 @@ function App() {
 
   const fileData = () => {
 
-    console.log("File Selected", file);
-    if (file) {
-      return <div>
-        File Name: {file.name} <br></br>
-        File Size: {file.size} bytes<br></br>
-        Last Modified: {new Date(file.lastModifiedDate).toUTCString()} <br></br>
-      </div>
+    console.log("Files Selected", files);
+    if (files.length > 0) {
+      let details = [];
+      for (let file of files) {
+
+        details.push(
+          <>
+            <hr></hr>
+            File Name: {file.name} <br></br>
+              File Size: {file.size} bytes<br></br>
+              Last Modified: {new Date(file.lastModifiedDate).toUTCString()} <br></br>
+          </>
+        );
+      }
+      return details;
     }
     else {
       return <div>
-        Click Pick File to select the file.
+        Click Pick Files to select the files.
       </div>;
     }
   }
@@ -53,8 +62,8 @@ function App() {
 
   return (
     <div className="App">
-      <input style={{ display: "none" }} type="file" onChange={(e) => inputFileHandler(e)} ref={inputRef} />
-      <button onClick={() => inputRef.current.click()} >Pick File</button>
+      <input style={{ display: "none" }} type="file" multiple onChange={(e) => inputFileHandler(e)} ref={inputRef} />
+      <button onClick={() => inputRef.current.click()} >Pick Files</button>
       <button onClick={() => fileUploadHandler()}>
         Upload
       </button>
